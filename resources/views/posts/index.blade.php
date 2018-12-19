@@ -1,5 +1,27 @@
 @extends('layouts.blog')
 @section('content')
+<script type="text/javascript">
+	function loadMore(){
+		var url = $('#load_mode_div .float-right').data('href');
+		$.ajax({
+			type :'GET',
+			url: url,
+			success : function(data){
+				if(data.length ==0){
+				}else{
+					$('list-post').append(data.html);
+					if(data.hasMore)
+						var html = '<a class="btn btn-primary float-right" onclick="loadMore();" data-href="'+ data.url+'">Older Posts &rarr;</a>';
+					else
+						html = '';
+					$('#load_mode_div').html(html);
+				}
+			},error: function(data){
+				alert('CÓ LỖI')
+			}
+		});
+	}
+</script>
 <header class="masthead" style="background-image: url('img/post-bg.jpg')">
   	<div class="overlay"></div>
 	<div class="container">
@@ -19,28 +41,21 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
-          @foreach($posts as $post)
-        	<div class="post-preview">
-            	<a href="post.html">
-             		<h2 class="post-title">
-            			{{ $post -> title }}
-              		</h2>
-              		<h3 class="post-subtitle">
-               			{{ $post -> content }}
-              		</h3>
-            	</a>
-            	<p class="post-meta">Posted by
-              	<a href="#">KtH</a>
-          	</div>
-        	<hr>
-        	@endforeach
+          	
+        		@include('posts._list')
 
           	{{ $posts -> links() }}
           	<!-- Pager -->
+          	
           	<div class="clearfix">
-            	<a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+            	<a class="btn btn-primary float-right" onclick="loadMore();" data-href="{{$posts->nextPageUrl()}}">Older Posts &rarr;</a>
+            	<a class="btn btn-primary float-letf" data-href="{{$posts->previousPageUrl()}}"> &larr; Previos Posts</a>
         	</div>
+        	
         </div>
     </div>
 </div>
+@stop
+@section('css')
+<link rel="stylesheet" type="text/css" href="/css/posts.css">
 @stop
